@@ -19,7 +19,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform checkGroundPoint;
     [SerializeField] private Transform checkWallPoint;
     [SerializeField] private Transform checkGrabPoint;
-    [SerializeField] private float radOfCircle;
+    [SerializeField] private float radOfGroundCircle;
+    [SerializeField] private float radOfWallingCircle;
     [SerializeField] private LayerMask whatIsGround;
     private bool isGrounded;
     private bool isWalling;
@@ -43,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
+        CheckGround();
         Jump();
         ClimbOrRelease();
         SetAnimationState();
@@ -74,7 +76,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Jump()
     {
-        CheckGround();
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce);
@@ -104,7 +105,6 @@ public class PlayerMovement : MonoBehaviour
     {
         canDash = false;
         isDashing = true;
-        //float originalGravity = rb2D.gravityScale;
         rb2D.gravityScale = 0f;
         col.enabled = false;
         rb2D.velocity = new Vector2(dashSpeed * transform.localScale.x, 0f);
@@ -120,9 +120,9 @@ public class PlayerMovement : MonoBehaviour
 
     void CheckGround()
     {
-        isGrounded = Physics2D.OverlapCircle(checkGroundPoint.position, radOfCircle, whatIsGround);
-        isWalling = Physics2D.OverlapCircle(checkWallPoint.position, radOfCircle, whatIsGround);
-        isGrab = Physics2D.OverlapCircle(checkGrabPoint.position, radOfCircle, whatIsGround);
+        isGrounded = Physics2D.OverlapCircle(checkGroundPoint.position, radOfGroundCircle, whatIsGround);
+        isWalling = Physics2D.OverlapCircle(checkWallPoint.position, radOfWallingCircle, whatIsGround);
+        isGrab = Physics2D.OverlapCircle(checkGrabPoint.position, radOfWallingCircle, whatIsGround);
     }
 
     void Flip()
@@ -136,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
     void SetAnimationState()
     {
         anim.SetFloat("Run", Mathf.Abs(horizontal));
-        anim.SetBool("IsGrounded", !isGrounded);
+        anim.SetBool("IsGrounded", isGrounded);
         anim.SetFloat("VelocityY", rb2D.velocity.y);
         anim.SetBool("Dashing", isDashing);
         anim.SetBool("IsGrab", isGrab);
@@ -145,8 +145,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawSphere(checkGroundPoint.position, radOfCircle);
-        Gizmos.DrawSphere(checkWallPoint.position, radOfCircle);
-        Gizmos.DrawSphere(checkGrabPoint.position, radOfCircle);
+        Gizmos.DrawWireSphere(checkGroundPoint.position, radOfGroundCircle);
+        Gizmos.DrawWireSphere(checkWallPoint.position, radOfWallingCircle);
+        Gizmos.DrawWireSphere(checkGrabPoint.position, radOfWallingCircle);
     }
 }
