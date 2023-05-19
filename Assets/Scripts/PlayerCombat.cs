@@ -10,10 +10,9 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private float attackRange, attack1Damage;
     [SerializeField] private LayerMask enemyLayers;
     [SerializeField] private bool combatEnabled;
-    bool gotInput, isAttacking, isFirstAttack;
+    [SerializeField] private float attackRate;
 
-    [SerializeField] private float inputTimer;
-    float lastInputTime = Mathf.NegativeInfinity;
+    bool isAttacking;
     float nextAttackTime;
 
     private void Start()
@@ -23,53 +22,25 @@ public class PlayerCombat : MonoBehaviour
     }
     private void Update()
     {
-        //if (Time.time >= nextAttackTime)
-        //{
-        //    if (Input.GetButtonDown("Fire1"))
-        //    {
-        //        Attack();
-        //        nextAttackTime = Time.time + 1f / attackRate;
-        //    }
-        //}
-        CheckCombatInput();
-        CheckAttacks();
-    }
-
-    private void CheckCombatInput()
-    {
-        if(Input.GetMouseButtonDown(0))
+        if (Time.time >= nextAttackTime)
         {
-            if (combatEnabled)
+            if (Input.GetButtonDown("Fire1"))
             {
-                gotInput = true;
-                lastInputTime = Time.time;
+                if(!isAttacking)
+                {
+                    isAttacking = true;
+                    Attack();
+                    nextAttackTime = Time.time + 1f / attackRate;
+                }
             }
-        }
-    }
-
-    private void CheckAttacks()
-    {
-        if(gotInput)
-        {
-            if(!isAttacking)
-            {
-                gotInput = false;
-                isAttacking = true;
-                isFirstAttack = !isFirstAttack;
-                anim.SetBool("Attack1", true);
-                anim.SetBool("FirstAttack", isFirstAttack);
-                anim.SetBool("IsAttacking", isAttacking);
-            }
-        }
-
-        if(Time.time >= lastInputTime + inputTimer)
-        {
-            gotInput = false;
         }
     }
 
     private void Attack()
     {
+        anim.SetBool("Attack1", true);
+        anim.SetBool("IsAttacking", isAttacking);
+
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
         foreach(Collider2D enemy in hitEnemies)
