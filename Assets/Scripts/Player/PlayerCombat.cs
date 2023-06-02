@@ -11,6 +11,7 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private LayerMask enemyLayers;
     [SerializeField] private bool combatEnabled;
     [SerializeField] private float attackRate;
+    [SerializeField] private int damage;
 
     bool isAttacking;
     float nextAttackTime;
@@ -45,7 +46,7 @@ public class PlayerCombat : MonoBehaviour
 
         foreach(Collider2D enemy in hitEnemies)
         {
-            Debug.Log("Damage" + enemy.name);
+            enemy.GetComponent<EnemyHealth>().TakeDamage(damage);
         }
     }
 
