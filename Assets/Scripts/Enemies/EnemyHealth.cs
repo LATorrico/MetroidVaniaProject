@@ -26,5 +26,6 @@ public class EnemyHealth : MonoBehaviour
     {
         //Die effect and disable gameobject
         Debug.Log("Muerto!");
+        Destroy(gameObject);
     }
 }

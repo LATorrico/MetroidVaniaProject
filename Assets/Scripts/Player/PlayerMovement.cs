@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D rb2D;
     Animator anim;
     Collider2D col;
+    PlayerCombat playerCombat;
 
     [SerializeField] private float moveSpeed;
 
@@ -47,8 +48,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Ladder")]
     [SerializeField] private float onLadderSpeed;
-    LadderController ladderController;
-    private bool onLadder = false; 
+    private bool onLadder = false;
 
 
     private void Start()
@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
         col = GetComponent<Collider2D>();
         originalGravity = rb2D.gravityScale;
         vecGravity = new Vector2(0, -Physics2D.gravity.y);
-        ladderController = GetComponent<LadderController>();
+        playerCombat = GetComponent<PlayerCombat>();
     }
 
     private void Update()
@@ -103,14 +103,14 @@ public class PlayerMovement : MonoBehaviour
                 currentJumpM = jumpMultiplier * (1 - t);
             }
 
-            rb2D.velocity += vecGravity * jumpMultiplier * Time.deltaTime;
+            rb2D.velocity += vecGravity * currentJumpM * Time.deltaTime;
         } 
     }
 
     private void FixedUpdate()
     {
         //Move
-        if(!isDashing)
+        if(!isDashing && playerCombat.isAttacking == false)
         {
             rb2D.velocity = new Vector2(horizontal * moveSpeed, rb2D.velocity.y);
         }
@@ -154,12 +154,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    //Climb or release when player is grab
     void ClimbOrRelease()
     {
         if (Input.GetKeyDown(KeyCode.W) && !isGrounded && isWalling && !isGrab && !isBorderPlatform ||
             Input.GetButtonDown("Jump") && !isGrounded && isWalling && !isGrab && !isBorderPlatform)
         {
-            transform.position = new Vector2(transform.position.x, transform.position.y + 0.1f);
+            transform.position = new Vector2(transform.position.x, transform.position.y + 0.2f);
             rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce);
             rb2D.gravityScale = originalGravity;
             isGrab = true;
@@ -192,6 +193,7 @@ public class PlayerMovement : MonoBehaviour
         canDash = true;
     }
 
+    //For platform trigger when the player is on ladder
     private void OnTriggerStay2D(Collider2D other)
     {
         if (other.CompareTag("Ladder"))
@@ -220,6 +222,8 @@ public class PlayerMovement : MonoBehaviour
         isBorderPlatform = Physics2D.OverlapCircle(checkBorderPlatform.position, radOfWallingCircle, whatIsGround);
     }
 
+
+    //Flip player
     void Flip()
     {
         facingRight = !facingRight;
@@ -228,6 +232,7 @@ public class PlayerMovement : MonoBehaviour
         transform.localScale = scale;
     }
 
+    //Player animations
     void SetAnimationState()
     {
         anim.SetFloat("Run", Mathf.Abs(horizontal));

@@ -13,7 +13,7 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private float attackRate;
     [SerializeField] private int damage;
 
-    bool isAttacking;
+    public bool isAttacking;
     float nextAttackTime;
 
     private void Start()
