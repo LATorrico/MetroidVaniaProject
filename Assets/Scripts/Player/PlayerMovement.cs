@@ -17,21 +17,32 @@ public class PlayerMovement : MonoBehaviour
     float originalGravity;
 
     [Header("Jump System")]
+    [Space(5)]
     [SerializeField] private float jumpForce;
-    [SerializeField] private float fallMultiplier;
-    [SerializeField] private float jumpMultiplier;
     [SerializeField] private float jumpTime;
+
+    [Space(5)]
+
+    [SerializeField] private float jumpMultiplier;
+    [SerializeField] private float fallMultiplier;
     Vector2 vecGravity;
     bool isJumping;
     float jumpCounter;
 
     [Header("CheckGround")]
+    [Space(5)]
     [SerializeField] private Transform checkGroundPoint;
     [SerializeField] private Transform checkWallPoint;
     [SerializeField] private Transform checkGrabPoint;
     [SerializeField] private Transform checkBorderPlatform;
+
+    [Space(10)]
+
     [SerializeField] private float radOfGroundCircle;
     [SerializeField] private float radOfWallingCircle;
+
+    [Space(10)]
+
     [SerializeField] private LayerMask whatIsGround;
     private bool isGrounded;
     private bool isWalling;
@@ -39,16 +50,31 @@ public class PlayerMovement : MonoBehaviour
     private bool isBorderPlatform;
 
     [Header("Dash")]
+    [Space(5)]
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashTime;
     [SerializeField] private float dashCoolDown;
+
+    [Space(10)]
+
     [SerializeField] private Collider2D dashCollider;
     private bool canDash = true;
     private bool isDashing;
 
     [Header("Ladder")]
+    [Space(5)]
     [SerializeField] private float onLadderSpeed;
     private bool onLadder = false;
+
+    [Space(10)]
+
+    [Header("KnockBack")]
+    [Space(5)]
+    [SerializeField] private Transform center;
+    [SerializeField] private float knockBackVel;
+    [SerializeField] private float knockBackTime;
+    bool knockBacked;
+
 
 
     private void Start()
@@ -110,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         //Move
-        if(!isDashing && playerCombat.isAttacking == false)
+        if(!isDashing && playerCombat.isAttacking == false && !knockBacked)
         {
             rb2D.velocity = new Vector2(horizontal * moveSpeed, rb2D.velocity.y);
         }
@@ -193,6 +219,21 @@ public class PlayerMovement : MonoBehaviour
         canDash = true;
     }
 
+    public void KnockBack(Transform t)
+    {
+        var dir = center.position - t.position;
+        knockBacked = true;
+        rb2D.velocity = dir.normalized * knockBackVel;
+        StartCoroutine("UnKnockBack");
+        Debug.Log("Knockback");
+    }
+
+    IEnumerator UnKnockBack()
+    {
+        yield return new WaitForSeconds(knockBackTime);
+        knockBacked = false;
+    }
+
     //For platform trigger when the player is on ladder
     private void OnTriggerStay2D(Collider2D other)
     {
@@ -243,7 +284,6 @@ public class PlayerMovement : MonoBehaviour
         anim.SetBool("IsBorderPlatform", isBorderPlatform);
         anim.SetBool("OnLadder", onLadder);
         anim.SetFloat("LadderVelocityY", Mathf.Abs(vertical));
-
         anim.SetFloat("VelocityY", rb2D.velocity.y);
     }
 

@@ -7,19 +7,22 @@ public class PlayerCombat : MonoBehaviour
     Animator anim;
 
     [SerializeField] private Transform attackPoint;
-    [SerializeField] private float attackRange, attack1Damage;
-    [SerializeField] private LayerMask enemyLayers;
-    [SerializeField] private bool combatEnabled;
+    [Space(5)]
+    [SerializeField] private float attackRange;
     [SerializeField] private float attackRate;
+    [Space(5)]
+    [SerializeField] private LayerMask enemyLayers;
+
+    [Space(10)]
+
     [SerializeField] private int damage;
 
-    public bool isAttacking;
+    [HideInInspector] public bool isAttacking;
     float nextAttackTime;
 
     private void Start()
     {
         anim = GetComponent<Animator>();
-        anim.SetBool("CanAttack", combatEnabled);
     }
     private void Update()
     {
@@ -39,12 +42,15 @@ public class PlayerCombat : MonoBehaviour
 
     private void Attack()
     {
-        anim.SetBool("Attack1", true);
+        anim.SetBool("Attack", true);
         anim.SetBool("IsAttacking", isAttacking);
+    }
 
+    private void Damage()
+    {
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
-        foreach(Collider2D enemy in hitEnemies)
+        foreach (Collider2D enemy in hitEnemies)
         {
             enemy.GetComponent<EnemyHealth>().TakeDamage(damage);
         }
@@ -54,13 +60,11 @@ public class PlayerCombat : MonoBehaviour
     {
         isAttacking = false;
         anim.SetBool("IsAttacking", isAttacking);
-        anim.SetBool("Attack1", false);
+        anim.SetBool("Attack", false);
     }
 
     private void OnDrawGizmos()
     {
-        if (attackPoint == null)
-            return;
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
 }

@@ -10,11 +10,13 @@ public class WizardAttack : MonoBehaviour
 
     [SerializeField] private GameObject fireballPrefab;
     [SerializeField] private Transform fireballInstantiatePoint;
+
+    [Space(5)]
+
     [SerializeField] private float timeBetweenAttacks;
     [SerializeField] private float fireballSpeed;
 
     float timer;
-
 
     private void Start()
     {

@@ -14,6 +14,7 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        //Hurt animation
         currentHealth -= damage;
 
         if (currentHealth <= 0)

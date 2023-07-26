@@ -6,9 +6,13 @@ using UnityEngine;
 
 public class VikingEnemyController : MonoBehaviour
 {
-    PlayerDetect playerDetect;
+    Rigidbody2D rb2D;
     Animator anim;
     GameObject player;
+
+    PlayerDetect playerDetect;
+    PlayerHealth playerHealth;
+    PlayerMovement playerMovement;
 
     [SerializeField] private float distanceDetectY;
     [SerializeField] private float attackDistance;
@@ -16,24 +20,41 @@ public class VikingEnemyController : MonoBehaviour
     Vector2 distanceToPlayer;
 
     [Header("Patrol")]
+    [Space(5)]
     [SerializeField] private Transform rayPoint;
     [SerializeField] private Transform checkPlayerPoint;
+
+    [Space(10)]
+
     [SerializeField] private float rayDownDistance;
     [SerializeField] private float rayForwardDistance;
     [SerializeField] private float rayPlayerDetectDistance;
+
+    [Space(10)]
+
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask playerLayer;
+
+    [Space(10)]
 
     [SerializeField] private float moveSpeed;
     [SerializeField] private float waitTime;
 
-    Rigidbody2D rb2D;
     bool checkDown;
     bool checkForward;
     bool checkPlayer;
     bool isAttacking;
 
+    [Header("Attack")]
+    [Space(5)]
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private Vector2 attackRange;
+
+    [Space(10)]
+
     [SerializeField] private float timeBetweenAttacks;
+    [SerializeField] private int damage;
+    
     float timer;
 
     private void Start()
@@ -42,6 +63,8 @@ public class VikingEnemyController : MonoBehaviour
         playerDetect = GetComponent<PlayerDetect>();
         anim = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player");
+        playerHealth = player.GetComponent<PlayerHealth>();
+        playerMovement = player.GetComponent<PlayerMovement>();
     }
 
     private void Update()
@@ -96,7 +119,20 @@ public class VikingEnemyController : MonoBehaviour
     private void Attack()
     {
         isAttacking = true;
+        //Collider2D hitPlayer = Physics2D.OverlapCircle(attackPoint.position, attackRange, playerLayer);
+        
         anim.SetTrigger("Attack");
+    }
+
+    private void Damage()
+    {
+        Collider2D hitPlayer = Physics2D.OverlapBox(attackPoint.position, attackRange, 90, playerLayer);
+
+        if (hitPlayer != null)
+        {
+            playerHealth.TakeDamage(damage);
+            playerMovement.KnockBack(transform);
+        }
     }
 
     IEnumerator Patrolling()
@@ -128,5 +164,6 @@ public class VikingEnemyController : MonoBehaviour
         Gizmos.DrawLine(rayPoint.transform.position, rayPoint.transform.position + Vector3.down * rayDownDistance);
         Gizmos.DrawLine(rayPoint.transform.position, rayPoint.transform.position + new Vector3(transform.localScale.x * rayForwardDistance, 0));
         Gizmos.DrawLine(checkPlayerPoint.transform.position, checkPlayerPoint.transform.position + new Vector3(transform.localScale.x * rayPlayerDetectDistance, 0));
+        Gizmos.DrawWireCube(attackPoint.position, attackRange);
     }
 }
