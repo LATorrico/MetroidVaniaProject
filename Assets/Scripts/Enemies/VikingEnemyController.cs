@@ -119,8 +119,6 @@ public class VikingEnemyController : MonoBehaviour
     private void Attack()
     {
         isAttacking = true;
-        //Collider2D hitPlayer = Physics2D.OverlapCircle(attackPoint.position, attackRange, playerLayer);
-        
         anim.SetTrigger("Attack");
     }
 

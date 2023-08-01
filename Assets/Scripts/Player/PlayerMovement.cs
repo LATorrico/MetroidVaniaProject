@@ -72,8 +72,7 @@ public class PlayerMovement : MonoBehaviour
     [Space(5)]
     [SerializeField] private Transform center;
     [SerializeField] private float knockBackVel;
-    [SerializeField] private float knockBackTime;
-    bool knockBacked;
+    public bool knockBacked;
 
 
 
@@ -224,14 +223,7 @@ public class PlayerMovement : MonoBehaviour
         var dir = center.position - t.position;
         knockBacked = true;
         rb2D.velocity = dir.normalized * knockBackVel;
-        StartCoroutine("UnKnockBack");
         Debug.Log("Knockback");
-    }
-
-    IEnumerator UnKnockBack()
-    {
-        yield return new WaitForSeconds(knockBackTime);
-        knockBacked = false;
     }
 
     //For platform trigger when the player is on ladder
